@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import axios from 'axios'
+import config from '../config'
 
-const UPLOAD_LAMBDA = '' // fill after API Gateway Day 9
-const SHARE_LAMBDA  = '' // fill after API Gateway Day 9
+const UPLOAD_URL = config.API_BASE + config.ENDPOINTS.upload
+const SHARE_URL  = config.API_BASE + config.ENDPOINTS.share
 
 function Upload({ user }) {
   const [file, setFile]         = useState(null)
@@ -23,7 +24,7 @@ function Upload({ user }) {
 
     try {
       // Step 1: Get pre-signed S3 URL
-      const res = await axios.post(UPLOAD_LAMBDA, {
+      const res = await axios.post(UPLOAD_URL, {
         fileName:    file.name,
         fileType:    file.type,
         expiryHours: expiry,
@@ -41,7 +42,7 @@ function Upload({ user }) {
 
       // Step 3: Generate share link
       setStatus('Generating share link...')
-      const shareRes = await axios.post(SHARE_LAMBDA, {
+      const shareRes = await axios.post(SHARE_URL, {
         fileId: newFileId
       })
 

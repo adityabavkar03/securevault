@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Upload from './pages/Upload'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -9,11 +10,16 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login onLogin={setUser} />} />
+        <Route path="/login"    element={<Login onLogin={setUser} />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/upload"   element={
+          user
+            ? <Upload user={user} />
+            : <Navigate to="/login" />
+        } />
         <Route path="/" element={
           user
-            ? <h2 style={{ padding: '40px' }}>Welcome {user.username}! Dashboard coming on Day 11.</h2>
+            ? <Navigate to="/upload" />
             : <Navigate to="/login" />
         } />
       </Routes>
