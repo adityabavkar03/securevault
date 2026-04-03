@@ -6,6 +6,7 @@ import Login    from './pages/Login'
 import Register from './pages/Register'
 import Upload   from './pages/Upload'
 import Dashboard from './pages/Dashboard'
+import FileAccess from './pages/FileAccess'
 import Navbar   from './components/Navbar'
 
 function App() {
@@ -43,28 +44,21 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Navbar user={user} onLogout={() => setUser(null)} />
-
+      {/* Only show Navbar on protected pages */}
+      {user && <Navbar user={user} onLogout={() => setUser(null)} />}
       <Routes>
-        <Route path="/login" element={
-          user ? <Navigate to="/dashboard" /> : <Login onLogin={setUser} />
-        } />
+        {/* Public routes */}
+        <Route path="/f/:shortCode" element={<FileAccess />} />
+        <Route path="/login"        element={ user ? <Navigate to="/dashboard" /> : <Login onLogin={setUser} /> } />
+        <Route path="/register"     element={<Register />} />
 
-        <Route path="/register" element={<Register />} />
-
-        <Route path="/upload" element={
-          user ? <Upload user={user} /> : <Navigate to="/login" />
-        } />
-
-        <Route path="/dashboard" element={
-          user ? <Dashboard user={user} /> : <Navigate to="/login" />
-        } />
-
-        <Route path="/" element={
-          user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
-        } />
+        {/* Protected routes */}
+        <Route path="/upload"    element={ user ? <Upload user={user} />    : <Navigate to="/login" /> } />
+        <Route path="/dashboard" element={ user ? <Dashboard user={user} /> : <Navigate to="/login" /> } />
+        <Route path="/"          element={ user ? <Navigate to="/dashboard" /> : <Navigate to="/login" /> } />
       </Routes>
     </BrowserRouter>
+    
   )
 }
 

@@ -6,6 +6,7 @@ const config = {
     share:  '/share',
     files:  '/files',
     revoke: '/revoke',
+    access: '/access',
   }
 }
 
