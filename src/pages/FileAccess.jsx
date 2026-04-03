@@ -7,31 +7,23 @@ const ACCESS_URL = config.API_BASE + config.ENDPOINTS.access
 
 export default function FileAccess() {
   const { shortCode }  = useParams()
-  const [status,       setStatus]       = useState('loading')
-  const [fileInfo,     setFileInfo]      = useState(null)
-  const [password,     setPassword]      = useState('')
-  const [error,        setError]         = useState('')
-  const [downloading,  setDownloading]   = useState(false)
+  const [status,       setStatus]     = useState('loading')
+  const [fileInfo,     setFileInfo]   = useState(null)
+  const [password,     setPassword]   = useState('')
+  const [showPass,     setShowPass]   = useState(false)
+  const [error,        setError]      = useState('')
+  const [downloading,  setDownloading] = useState(false)
 
-  useEffect(() => {
-    // Try to access without password first
-    tryAccess()
-  }, [])
+  useEffect(() => { tryAccess() }, [])
 
   const tryAccess = async (pwd = '') => {
     setDownloading(true)
     setError('')
     try {
-      const res = await axios.post(ACCESS_URL, {
-        shortCode,
-        password: pwd
-      })
+      const res = await axios.post(ACCESS_URL, { shortCode, password: pwd })
       setFileInfo(res.data)
       setStatus('ready')
-
-      // Auto download
-      window.location.href = res.data.downloadUrl
-
+      setTimeout(() => { window.location.href = res.data.downloadUrl }, 800)
     } catch (err) {
       const data = err.response?.data
       if (data?.requirePassword) {
@@ -45,157 +37,167 @@ export default function FileAccess() {
     }
   }
 
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault()
-    tryAccess(password)
-  }
+  const bg = 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)'
 
-  // Loading screen
-  if (status === 'loading') {
-    return (
-      <div style={styles.center}>
-        <div style={styles.card}>
-          <p style={{ fontSize: '40px', margin: '0 0 16px' }}>🔐</p>
-          <h3 style={styles.title}>SecureVault</h3>
-          <p style={styles.sub}>Verifying secure link...</p>
+  const Card = ({ children }) => (
+    <div style={{
+      minHeight:      '100vh',
+      background:     '#f7f8fc',
+      display:        'flex',
+      alignItems:     'center',
+      justifyContent: 'center',
+      padding:        '20px'
+    }}>
+      <div style={{
+        background:   'white',
+        borderRadius: '20px',
+        padding:      '48px 36px',
+        textAlign:    'center',
+        boxShadow:    '0 8px 40px rgba(0,0,0,0.1)',
+        maxWidth:     '400px',
+        width:        '100%'
+      }}>
+        {/* Brand */}
+        <div style={{ marginBottom: '28px' }}>
+          <span style={{ fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>
+            🔐 SecureVault
+          </span>
         </div>
-      </div>
-    )
-  }
-
-  // Password required screen
-  if (status === 'password') {
-    return (
-      <div style={styles.center}>
-        <div style={styles.card}>
-          <p style={{ fontSize: '40px', margin: '0 0 16px' }}>🔑</p>
-          <h3 style={styles.title}>Password Required</h3>
-          <p style={styles.sub}>This file is password protected</p>
-          <form onSubmit={handlePasswordSubmit}>
-            <input
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              style={styles.input}
-              autoFocus
-            />
-            {error && (
-              <p style={{ color: '#c0392b', fontSize: '13px', margin: '8px 0' }}>
-                {error}
-              </p>
-            )}
-            <button
-              type="submit"
-              disabled={downloading}
-              style={styles.btn}
-            >
-              {downloading ? 'Verifying...' : 'Access File'}
-            </button>
-          </form>
-        </div>
-      </div>
-    )
-  }
-
-  // Ready / downloading screen
-  if (status === 'ready') {
-    return (
-      <div style={styles.center}>
-        <div style={styles.card}>
-          <p style={{ fontSize: '40px', margin: '0 0 16px' }}>✅</p>
-          <h3 style={styles.title}>Your download is starting!</h3>
-          <p style={styles.sub}>{fileInfo?.fileName}</p>
-          <p style={{ fontSize: '12px', color: '#aaa', marginTop: '8px' }}>
-            If download doesn't start automatically,{' '}
-            <a href={fileInfo?.downloadUrl} style={{ color: '#0f6e56' }}>
-              click here
-            </a>
-          </p>
-          {fileInfo?.customMessage && (
-            <div style={{
-              marginTop: '16px', padding: '12px',
-              background: '#f0fdf8', borderRadius: '8px',
-              border: '1px solid #c3e6d8'
-            }}>
-              <p style={{ fontSize: '13px', color: '#0f6e56', margin: 0 }}>
-                💬 {fileInfo.customMessage}
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  // Error screen
-  return (
-    <div style={styles.center}>
-      <div style={styles.card}>
-        <p style={{ fontSize: '40px', margin: '0 0 16px' }}>
-          {error?.includes('expired') || error?.includes('used') ? '⏰' : '❌'}
-        </p>
-        <h3 style={styles.title}>
-          {error?.includes('expired') ? 'Link Expired' :
-           error?.includes('used')    ? 'Link Already Used' :
-           'Link Not Found'}
-        </h3>
-        <p style={styles.sub}>{error}</p>
-        <a href="/" style={{ ...styles.btn, display: 'block', textDecoration: 'none', marginTop: '16px' }}>
-          Upload a new file
-        </a>
+        {children}
       </div>
     </div>
   )
-}
 
-const styles = {
-  center: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: '#f0f2f5',
-    padding: '20px'
-  },
-  card: {
-    background: 'white',
-    borderRadius: '16px',
-    padding: '40px 32px',
-    textAlign: 'center',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-    maxWidth: '400px',
-    width: '100%'
-  },
-  title: {
-    fontSize: '20px',
-    fontWeight: '700',
-    color: '#1a2e4a',
-    margin: '0 0 8px'
-  },
-  sub: {
-    fontSize: '14px',
-    color: '#888',
-    margin: '0 0 20px'
-  },
-  input: {
-    width: '100%',
-    padding: '12px',
-    borderRadius: '8px',
-    border: '1px solid #ddd',
-    fontSize: '14px',
-    marginBottom: '12px',
-    boxSizing: 'border-box'
-  },
-  btn: {
-    width: '100%',
-    padding: '13px',
-    background: 'linear-gradient(135deg, #1a2e4a, #0f6e56)',
-    color: 'white',
-    border: 'none',
-    borderRadius: '10px',
-    fontSize: '14px',
-    fontWeight: '600',
-    cursor: 'pointer'
-  }
+  if (status === 'loading') return (
+    <Card>
+      <div style={{
+        width: '56px', height: '56px',
+        background: '#eef2ff', borderRadius: '50%',
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'center', margin: '0 auto 16px', fontSize: '24px'
+      }}>⏳</div>
+      <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111827', margin: '0 0 8px' }}>
+        Verifying link...
+      </h3>
+      <p style={{ color: '#6b7280', fontSize: '14px', margin: 0 }}>
+        Checking security & expiry
+      </p>
+    </Card>
+  )
+
+  if (status === 'password') return (
+    <Card>
+      <div style={{
+        width: '56px', height: '56px',
+        background: '#fffbeb', borderRadius: '50%',
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'center', margin: '0 auto 16px', fontSize: '24px'
+      }}>🔑</div>
+      <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111827', margin: '0 0 6px' }}>
+        Password required
+      </h3>
+      <p style={{ color: '#6b7280', fontSize: '14px', margin: '0 0 24px' }}>
+        This file is password protected
+      </p>
+      <form onSubmit={e => { e.preventDefault(); tryAccess(password) }}>
+        <div style={{ position: 'relative', marginBottom: '12px' }}>
+          <input
+            type={showPass ? 'text' : 'password'}
+            placeholder="Enter password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            autoFocus
+            style={{
+              width: '100%', padding: '14px 44px 14px 14px',
+              borderRadius: '12px', border: '2px solid #e5e7eb',
+              fontSize: '15px', boxSizing: 'border-box', textAlign: 'center'
+            }}
+          />
+          <button type="button" onClick={() => setShowPass(!showPass)} style={{
+            position: 'absolute', right: '12px', top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px'
+          }}>
+            {showPass ? '🙈' : '👁️'}
+          </button>
+        </div>
+        {error && (
+          <p style={{ color: '#dc2626', fontSize: '13px', margin: '0 0 12px' }}>
+            ⚠️ {error}
+          </p>
+        )}
+        <button type="submit" disabled={downloading} style={{
+          width: '100%', padding: '14px',
+          background: downloading ? '#d1d5db' : bg,
+          color: 'white', border: 'none',
+          borderRadius: '12px', fontSize: '15px',
+          fontWeight: '600', cursor: downloading ? 'not-allowed' : 'pointer'
+        }}>
+          {downloading ? 'Verifying...' : 'Access File →'}
+        </button>
+      </form>
+    </Card>
+  )
+
+  if (status === 'ready') return (
+    <Card>
+      <div style={{
+        width: '64px', height: '64px',
+        background: 'linear-gradient(135deg, #ecfdf5, #d1fae5)',
+        borderRadius: '50%', display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        margin: '0 auto 16px', fontSize: '28px'
+      }}>✅</div>
+      <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111827', margin: '0 0 6px' }}>
+        Download starting!
+      </h3>
+      <p style={{ color: '#6b7280', fontSize: '14px', margin: '0 0 6px' }}>
+        {fileInfo?.fileName}
+      </p>
+      {fileInfo?.customMessage && (
+        <div style={{
+          marginTop: '16px', padding: '14px',
+          background: '#f0fdf4', borderRadius: '12px',
+          border: '1px solid #bbf7d0'
+        }}>
+          <p style={{ fontSize: '14px', color: '#065f46', margin: 0 }}>
+            💬 {fileInfo.customMessage}
+          </p>
+        </div>
+      )}
+      <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '16px' }}>
+        If download doesn't start,{' '}
+        <a href={fileInfo?.downloadUrl} style={{ color: '#4f46e5' }}>click here</a>
+      </p>
+    </Card>
+  )
+
+  return (
+    <Card>
+      <div style={{
+        width: '64px', height: '64px',
+        background: '#fef2f2', borderRadius: '50%',
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'center', margin: '0 auto 16px', fontSize: '28px'
+      }}>
+        {error?.includes('expired') || error?.includes('used') ? '⏰' : '❌'}
+      </div>
+      <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#111827', margin: '0 0 8px' }}>
+        {error?.includes('expired') ? 'Link Expired' :
+         error?.includes('used')    ? 'Already Used' :
+         'Link Not Found'}
+      </h3>
+      <p style={{ color: '#6b7280', fontSize: '14px', margin: '0 0 24px' }}>
+        {error}
+      </p>
+      <a href="/" style={{
+        display: 'block', padding: '14px',
+        background: bg, color: 'white',
+        borderRadius: '12px', fontSize: '14px',
+        fontWeight: '600', textDecoration: 'none'
+      }}>
+        Upload a new file →
+      </a>
+    </Card>
+  )
 }
