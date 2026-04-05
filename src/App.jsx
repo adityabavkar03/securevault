@@ -8,6 +8,7 @@ import Upload   from './pages/Upload'
 import Dashboard from './pages/Dashboard'
 import FileAccess from './pages/FileAccess'
 import Navbar   from './components/Navbar'
+import Landing from './pages/Landing'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -55,7 +56,8 @@ function App() {
         {/* Protected routes */}
         <Route path="/upload"    element={ user ? <Upload user={user} />    : <Navigate to="/login" /> } />
         <Route path="/dashboard" element={ user ? <Dashboard user={user} /> : <Navigate to="/login" /> } />
-        <Route path="/"          element={ user ? <Navigate to="/dashboard" /> : <Navigate to="/login" /> } />
+        <Route path="/"          element={ user ? <Navigate to="/dashboard" />: <Landing /> } />
+
       </Routes>
     </BrowserRouter>
     
