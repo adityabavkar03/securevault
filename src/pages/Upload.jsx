@@ -72,7 +72,7 @@ export default function Upload({ user }) {
         fileName:       file.name,
         fileType:       file.type || 'application/octet-stream',
         expiryHours:    getExpiryHours(),
-        userId:         user?.username || 'testuser',
+        userId: localStorage.getItem('sv_userId') || user?.signInDetails?.loginId || user?.username || 'testuser',
         protectionType,
         password,
         customMessage
@@ -741,7 +741,7 @@ export default function Upload({ user }) {
               >
                 Upload Another File
               </button>
-              
+              <a
                 href="/dashboard"
                 style={{
                   display:        'block',

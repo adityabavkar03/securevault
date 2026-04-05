@@ -68,7 +68,7 @@ export default function Navbar({ user, onLogout }) {
             { path: '/dashboard', label: 'Dashboard', icon: '📊' },
             { path: '/upload',    label: 'Upload',    icon: '⬆️' },
           ].map(link => (
-            
+            <a
               key={link.path}
               href={link.path}
               style={{
@@ -109,7 +109,7 @@ export default function Navbar({ user, onLogout }) {
               {(user?.username || 'U')[0].toUpperCase()}
             </div>
             <span style={{ fontSize: '13px', fontWeight: '500', color: '#374151' }}>
-              {user?.username?.split('@')[0] || 'User'}
+              {(user?.signInDetails?.loginId || user?.username || 'User').split('@')[0].substring(0, 12)}
             </span>
           </div>
 

@@ -16,6 +16,7 @@ export default function Login({ onLogin }) {
       try { await signOut() } catch {}
       await signIn({ username: email, password })
       const user = await getCurrentUser()
+      localStorage.setItem('sv_userId', email)
       onLogin(user)
       setTimeout(() => { window.location.href = '/dashboard' }, 300)
     } catch (err) {

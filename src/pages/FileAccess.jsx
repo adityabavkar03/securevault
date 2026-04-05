@@ -20,7 +20,11 @@ export default function FileAccess() {
     setDownloading(true)
     setError('')
     try {
-      const res = await axios.post(ACCESS_URL, { shortCode, password: pwd })
+      const res = await axios.post(ACCESS_URL, {
+  shortCode,
+  password:      pwd,
+  trackDownload: true  // ← only increment count on actual download
+})
       setFileInfo(res.data)
       setStatus('ready')
       setTimeout(() => { window.location.href = res.data.downloadUrl }, 800)
