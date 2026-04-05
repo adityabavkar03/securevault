@@ -7,7 +7,5 @@ import awsConfig from './aws-config'
 Amplify.configure(awsConfig)
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <App />
 )

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import config from '../config'
@@ -6,25 +6,30 @@ import config from '../config'
 const ACCESS_URL = config.API_BASE + config.ENDPOINTS.access
 
 export default function FileAccess() {
-  const { shortCode }  = useParams()
-  const [status,       setStatus]     = useState('loading')
-  const [fileInfo,     setFileInfo]   = useState(null)
-  const [password,     setPassword]   = useState('')
-  const [showPass,     setShowPass]   = useState(false)
-  const [error,        setError]      = useState('')
-  const [downloading,  setDownloading] = useState(false)
+  const { shortCode }   = useParams()
+  const [status,        setStatus]      = useState('loading')
+  const [fileInfo,      setFileInfo]    = useState(null)
+  const [password,      setPassword]    = useState('')
+  const [showPass,      setShowPass]    = useState(false)
+  const [error,         setError]       = useState('')
+  const [downloading,   setDownloading] = useState(false)
+  const hasRun = useRef(false)
 
-  useEffect(() => { tryAccess() }, [])
+  useEffect(() => {
+    if (hasRun.current) return
+    hasRun.current = true
+    tryAccess()
+  }, [])
 
   const tryAccess = async (pwd = '') => {
     setDownloading(true)
     setError('')
     try {
       const res = await axios.post(ACCESS_URL, {
-  shortCode,
-  password:      pwd,
-  trackDownload: true  // ← only increment count on actual download
-})
+        shortCode,
+        password:      pwd,
+        trackDownload: true
+      })
       setFileInfo(res.data)
       setStatus('ready')
       setTimeout(() => { window.location.href = res.data.downloadUrl }, 800)
@@ -61,7 +66,6 @@ export default function FileAccess() {
         maxWidth:     '400px',
         width:        '100%'
       }}>
-        {/* Brand */}
         <div style={{ marginBottom: '28px' }}>
           <span style={{ fontSize: '13px', fontWeight: '600', color: '#6b7280' }}>
             🔐 SecureVault
@@ -117,11 +121,15 @@ export default function FileAccess() {
               fontSize: '15px', boxSizing: 'border-box', textAlign: 'center'
             }}
           />
-          <button type="button" onClick={() => setShowPass(!showPass)} style={{
-            position: 'absolute', right: '12px', top: '50%',
-            transform: 'translateY(-50%)',
-            background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px'
-          }}>
+          <button
+            type="button"
+            onClick={() => setShowPass(!showPass)}
+            style={{
+              position: 'absolute', right: '12px', top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px'
+            }}
+          >
             {showPass ? '🙈' : '👁️'}
           </button>
         </div>
@@ -130,13 +138,17 @@ export default function FileAccess() {
             ⚠️ {error}
           </p>
         )}
-        <button type="submit" disabled={downloading} style={{
-          width: '100%', padding: '14px',
-          background: downloading ? '#d1d5db' : bg,
-          color: 'white', border: 'none',
-          borderRadius: '12px', fontSize: '15px',
-          fontWeight: '600', cursor: downloading ? 'not-allowed' : 'pointer'
-        }}>
+        <button
+          type="submit"
+          disabled={downloading}
+          style={{
+            width: '100%', padding: '14px',
+            background: downloading ? '#d1d5db' : bg,
+            color: 'white', border: 'none',
+            borderRadius: '12px', fontSize: '15px',
+            fontWeight: '600', cursor: downloading ? 'not-allowed' : 'pointer'
+          }}
+        >
           {downloading ? 'Verifying...' : 'Access File →'}
         </button>
       </form>
@@ -194,12 +206,15 @@ export default function FileAccess() {
       <p style={{ color: '#6b7280', fontSize: '14px', margin: '0 0 24px' }}>
         {error}
       </p>
-      <a href="/" style={{
-        display: 'block', padding: '14px',
-        background: bg, color: 'white',
-        borderRadius: '12px', fontSize: '14px',
-        fontWeight: '600', textDecoration: 'none'
-      }}>
+      <a
+        href="/"
+        style={{
+          display: 'block', padding: '14px',
+          background: bg, color: 'white',
+          borderRadius: '12px', fontSize: '14px',
+          fontWeight: '600', textDecoration: 'none'
+        }}
+      >
         Upload a new file →
       </a>
     </Card>
