@@ -33,7 +33,7 @@ export default function Navbar({ user, onLogout }) {
       boxShadow:     '0 1px 8px rgba(0,0,0,0.06)'
     }}>
       {/* Logo */}
-      <a href="/dashboard" style={{
+      <a href="/" style={{
         display:    'flex',
         alignItems: 'center',
         gap:        '10px',

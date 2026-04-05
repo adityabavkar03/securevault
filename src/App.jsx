@@ -19,21 +19,25 @@ function App() {
   }, [])
 
   const checkUser = async () => {
-    try {
-      const session = await fetchAuthSession()
-
-      if (session?.tokens?.accessToken) {
-        const currentUser = await getCurrentUser()
-        setUser(currentUser)
-      } else {
-        setUser(null)
+  try {
+    const session = await fetchAuthSession()
+    if (session?.tokens?.accessToken) {
+      const currentUser = await getCurrentUser()
+      // Auto-save email to localStorage
+      const email = currentUser?.signInDetails?.loginId
+      if (email) {
+        localStorage.setItem('sv_userId', email)
       }
-    } catch {
+      setUser(currentUser)
+    } else {
       setUser(null)
-    } finally {
-      setLoading(false)
     }
+  } catch {
+    setUser(null)
+  } finally {
+    setLoading(false)
   }
+}
 
   if (loading) {
     return (
