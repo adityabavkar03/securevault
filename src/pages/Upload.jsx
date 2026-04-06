@@ -135,14 +135,30 @@ export default function Upload({ user }) {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f7f8fc' }}>
-      {/* Hero section */}
+    
+       {/* Hero section */}
       <div style={{
-        background:    'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+        background:    'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
         padding:       '48px 24px 80px',
         textAlign:     'center',
         position:      'relative',
         overflow:      'hidden'
       }}>
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+        backgroundSize: '32px 32px',
+        pointerEvents: 'none'
+      }}/>
+
+      <div style={{
+        position: 'absolute', width: '400px', height: '400px',
+        background: 'radial-gradient(circle, rgba(79,70,229,0.3) 0%, transparent 65%)',
+        borderRadius: '50%', top: '-100px', right: '-50px',
+        animation: 'glow1 8s ease-in-out infinite',
+        pointerEvents: 'none'
+    }}/>
+      
         <div style={{
           position:   'absolute', top: 0, left: 0,
           right: 0,   bottom: 0,
